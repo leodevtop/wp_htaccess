@@ -1,0 +1,63 @@
+
+
+<Limit PUT DELETE>
+	order deny,allow
+	deny from all
+</Limit>
+
+# END LIMIT #############################################
+
+## Can be commented out if causes errors, see notes above.
+Options +FollowSymLinks
+
+# REDIRECT ###############################################
+
+<IfModule mod_rewrite.c>
+
+	# REDIRECT to no-www
+	RewriteEngine On
+	RewriteCond %{HTTP_HOST} ^www.(.+) [NC]
+	RewriteRule ^(.*) https://%1/$1 [R=301,NE,L]
+</IfModule>
+
+
+# SECURITY ####################################################
+<files ~ "^.*\.([Hh][Tt][Aa])">
+	order allow,deny
+	deny from all
+	satisfy all
+</files>
+
+# Deny access to wp-config.php file
+<files wp-config.php>
+	order allow,deny
+	deny from all
+</files>
+
+<FilesMatch "\.(txt|md|exe|sh|bak|inc|pot|po|mo|log|sql)$">
+	Order allow,deny
+	Deny from all
+</FilesMatch>
+<Files robots.txt>
+	Allow from all
+</Files>
+<Files ads.txt>
+	Allow from all
+</Files>
+# END SECURITY ####################################################
+
+# BEGIN WordPress
+# The directives (lines) between "BEGIN WordPress" and "END WordPress" are
+# dynamically generated, and should only be modified via WordPress filters.
+# Any changes to the directives between these markers will be overwritten.
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+	RewriteBase /
+	RewriteRule ^index\.php$ - [L]
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
